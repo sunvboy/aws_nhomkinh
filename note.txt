@@ -1,0 +1,77 @@
+Check empty get(): @if(!$result->isEmpty())
+Check empty first(): if ($result) { } 
+
+/*Tạo 1 module và phân quyền*/
+- php artisan make:model Stock -m
+- Tạo bảng: php artisan migrate
+- php artisan make:controller --resource StockController
+- php artisan make:policy StockPolicy --model=Stock
+=> AuthServiceProvider
+$this->StockPolicy;
+public function StockPolicy()
+{
+    Gate::define('stock_index', [StockPolicy::class, 'index']);
+    Gate::define('stock_create', [StockPolicy::class, 'create']);
+    Gate::define('stock_edit', [StockPolicy::class, 'edit']);
+    Gate::define('stock_destroy', [StockPolicy::class, 'destroy']);
+}
+=> config/permissions.php
++ add: modules stock
++ add:
+'stock' => [
+    'index' => 'stock_index',
+    'create' => 'stock_create',
+    'edit' => 'stock_edit',
+    'destroy' => 'stock_destroy',
+],
+=> router
+Route::group(['prefix' => '/stock'], function () {
+    Route::get('/index', [StockController::class, 'index'])->name('stock.index')->middleware('can:stock_index');
+    Route::get('/create', [StockController::class, 'create'])->name('stock.create')->middleware('can:stock_create');
+    Route::post('/store', [StockController::class, 'store'])->name('stock.store')->middleware('can:stock_create');
+    Route::get('/edit/{id}', [StockController::class, 'edit'])->name('stock.edit')->middleware('can:stock_edit');
+    Route::post('/update/{id}', [StockController::class, 'update'])->name('stock.update')->middleware('can:stock_edit');
+    Route::get('/destroy/{id}', [StockController::class, 'destroy'])->name('stock.destroy')->middleware('can:stock_destroy');
+});
+=> ngoài blade
+@can('stock_index')
+
+@endcan
+@can('stock_create')
+
+@endcan
+@can('stock_edit')
+
+@endcan
+/*end*/
+//Carbon
+// $date = \Carbon\Carbon::now();
+// $startOfWeek = $date->startOfWeek();
+$today = \Carbon\Carbon::now();
+$mo =  \Carbon\Carbon::now()->startOfWeek();
+$tu =  \Carbon\Carbon::now()->startOfWeek()->addDays(1); //thứ 3
+$we =  \Carbon\Carbon::now()->startOfWeek()->addDays(2); //thứ 4
+$th =  \Carbon\Carbon::now()->startOfWeek()->addDays(3); //thứ 5
+$fr =  \Carbon\Carbon::now()->startOfWeek()->addDays(4); //thứ 6
+$sa =  \Carbon\Carbon::now()->startOfWeek()->addDays(5); //thứ 7
+$su =  \Carbon\Carbon::now()->startOfWeek()->addDays(6); //chủ nhật
+// echo $mo; //thứ 2 => gốc 1
+// echo "<br>";
+// echo $tu; //thứ 3
+// echo "<br>";
+// echo $we; //thứ 4
+// echo "<br>";
+// echo $th; //thứ 5 => gốc 2
+// echo "<br>";
+// echo $fr; //thứ 6
+// echo "<br>";
+// echo $sa; //thứ 7
+// echo "<br>";
+// echo $su; //chủ nhật
+if ($today < $th) {
+    echo "Thời gian đặt hàng thứ 2:" . $th;
+} else if ($today >= $th && $today < $su) {
+    echo "Thời gian đặt hàng thứ 5:" . $su;
+} else if ($today == $su) {
+    echo "Thời gian đặt hàng thứ 2:" . $su->addDays(3);
+}

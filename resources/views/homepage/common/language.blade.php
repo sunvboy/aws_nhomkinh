@@ -1,0 +1,2 @@
+<a href="{{ $fcSystem['language_en'] }}"><img src="{{asset('images/en-icon.png')}}" alt="en icon" /></a>
+<a href="{{ $fcSystem['language_vi'] }}"><img src="{{asset('images/vn-icon.png')}}" alt="vn icon" /></a>
